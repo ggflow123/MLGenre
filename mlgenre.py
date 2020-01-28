@@ -9,6 +9,8 @@ import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
 
 def WriteConfusionMatrix(fname, result, labels, method):
     Fname = "result" + "_" + str(method) + "_" + str(fname[:-4]) + ".csv"
@@ -19,12 +21,21 @@ def WriteConfusionMatrix(fname, result, labels, method):
         file.write((",".join(list(map(str, result[i])))).replace('"', '') + "\n")
     return
 
+def DecisionTree(train, trainLabel, test):
+    classifier = DecisionTreeClassifier(criterion='entropy')
+    classifier.fit(train, trainLabel)
+    prediction = classifier.predict(test)
+    return prediction
+
 def SupportVectorClassification(train, trainLabel, test):
-    classifierSVC = SVC(gamma='auto')
+    classifierSVC = SVC(kernel='poly', gamma='auto')
     classifierSVC.fit(train, trainLabel)
-    print('fit complete')
     prediction = classifierSVC.predict(test)
-    print('prediction')
+    return prediction
+
+def GaussianNaiveBayes(train, trainLabel, test):
+    gnb = GaussianNB()
+    prediction = gnb.fit(train, trainLabel).predict(test)
     return prediction
 
 # Read in the file and generate different sessions
@@ -51,7 +62,16 @@ def ReadData(filename, seed, pt):
                 one_hot = pd.get_dummies(data[a], prefix=a)
                 newdata = pd.concat([newdata, one_hot], axis=1)
             else:
-                newdata = pd.concat([newdata, data[a]], axis=1)
+                newlist = []
+                max = data[a][data[a].idxmax()]
+                min = data[a][data[a].idxmin()]
+                for j in range(len(data.index)):
+                    oldvalue = float(data[a][j])
+                    if max - min != 0:  # when max - min = 0, keep oldvalue
+                        newvalue = (oldvalue - min) / (max - min)
+                    newlist.append(newvalue)
+                # newdata = pd.concat([newdata, data[a]], axis=1)
+                newdata[a] = newlist
     # split the data into train, and test
     datalist = newdata.values.tolist()
     newattributes = list(newdata.columns)
@@ -73,11 +93,13 @@ def main():
         seed = int(sys.argv[3])
         train, test, trainLabel, testLabel, attributes, labels = ReadData(file, seed, pt)
         result = [[0 for x in range(len(labels))] for y in range(len(labels))]  # confusion matrix
-        y_pred = SupportVectorClassification(train, trainLabel, test)
+        # y_pred = SupportVectorClassification(train, trainLabel, test)
+        # y_pred = GaussianNaiveBayes(train, trainLabel, test)
+        y_pred = DecisionTree(train, trainLabel, test)
 
         count = 0
         for i in range(len(testLabel)):
-            print(i)
+            # print(i)
             if y_pred[i] == testLabel[i]:
                 count += 1
             result[labels.index(testLabel[i])][labels.index(y_pred[i])] += 1  # adding confusion matrix

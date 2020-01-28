@@ -54,6 +54,7 @@ def extract_data_into_one_instance(file):
     # print('mbtags', mbtags, 'tempo', tempo)
     artist_terms = artist_term[0].decode('utf-8')
     '''
+
     bars_start = np.array(GETTERS.get_bars_start(h5))
     beats_start = np.array(GETTERS.get_beats_start(h5))
     sections_start = np.array(GETTERS.get_sections_start(h5))
@@ -63,13 +64,12 @@ def extract_data_into_one_instance(file):
     segments_start = np.array(GETTERS.get_segments_start(h5))
     segments_timbre = np.array(GETTERS.get_segments_timbre(h5))
     tatums_start = np.array(GETTERS.get_tatums_start(h5))
-    '''
 
-    '''
     instance = [artist_terms, bars_start, beats_start, sections_start,
                 segments_loudness_max, segments_loudness_max_time,
                 segments_pitches, segments_start, segments_timbre,
-                tatums_start, tempo, time_signature]'''
+                tatums_start, tempo, time_signature]
+    '''
 
     instance_simple = [artist_terms, tempo, time_signature, key, loudness]
     h5.close()
