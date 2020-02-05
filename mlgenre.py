@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB, ComplementNB
 from sklearn.tree import DecisionTreeClassifier
 
 def WriteConfusionMatrix(fname, result, labels, method):
@@ -28,13 +28,18 @@ def DecisionTree(train, trainLabel, test):
     return prediction
 
 def SupportVectorClassification(train, trainLabel, test):
-    classifierSVC = SVC(kernel='poly', gamma='auto')
+    classifierSVC = SVC(kernel='rbf', gamma='auto')
     classifierSVC.fit(train, trainLabel)
     prediction = classifierSVC.predict(test)
     return prediction
 
 def GaussianNaiveBayes(train, trainLabel, test):
     gnb = GaussianNB()
+    prediction = gnb.fit(train, trainLabel).predict(test)
+    return prediction
+
+def ComplementNaiveBayes(train, trainLabel, test):
+    gnb = ComplementNB()
     prediction = gnb.fit(train, trainLabel).predict(test)
     return prediction
 
@@ -50,6 +55,7 @@ def ReadData(filename, seed, pt):
     labels = list(dict.fromkeys(labelList)) # remove repeated labels
     newdata = pd.DataFrame()
 
+
     # Preprocessing the data using pandas
     for i in range(len(attributes)):
         if i == 0:
@@ -59,7 +65,7 @@ def ReadData(filename, seed, pt):
             a = attributes[i]
             # if the data is the string, process one hot encoding
             if isinstance(data[a][0], str):
-                one_hot = pd.get_dummies(data[a], prefix=a)
+                one_hot = pd.get_dummies(data[a], prefix=a, drop_first=True)
                 newdata = pd.concat([newdata, one_hot], axis=1)
             else:
                 newlist = []
@@ -92,10 +98,13 @@ def main():
         pt = float(sys.argv[2])
         seed = int(sys.argv[3])
         train, test, trainLabel, testLabel, attributes, labels = ReadData(file, seed, pt)
-        result = [[0 for x in range(len(labels))] for y in range(len(labels))]  # confusion matrix
-        # y_pred = SupportVectorClassification(train, trainLabel, test)
+        print(labels)
+        result = [[0 for x in range(len(labels)+1)] for y in range(len(labels)+1)]  # confusion matrix
+        y_pred = SupportVectorClassification(train, trainLabel, test)
         # y_pred = GaussianNaiveBayes(train, trainLabel, test)
-        y_pred = DecisionTree(train, trainLabel, test)
+        # y_pred = DecisionTree(train, trainLabel, test)
+        # y_pred = ComplementNaiveBayes(train, trainLabel, test)
+
 
         count = 0
         for i in range(len(testLabel)):
@@ -103,6 +112,7 @@ def main():
             if y_pred[i] == testLabel[i]:
                 count += 1
             result[labels.index(testLabel[i])][labels.index(y_pred[i])] += 1  # adding confusion matrix
+
 
         print('accuracy: ', count/len(testLabel))
         print(classification_report(testLabel, y_pred))
