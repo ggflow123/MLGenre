@@ -13,7 +13,7 @@ from sklearn.naive_bayes import GaussianNB, ComplementNB
 from sklearn.tree import DecisionTreeClassifier
 
 def WriteConfusionMatrix(fname, result, labels, method):
-    Fname = "result" + "_" + str(method) + "_" + str(fname[:-4]) + ".csv"
+    Fname = "result" + "_" + str(method) + "_" + str(fname[:-4]) + "CategorizedTempo" + ".csv"
     file = open(Fname, "w+")
     file.write((",".join(list(map(str, labels)))).replace('"', '') + "\n")
     for i in range(len(labels)):

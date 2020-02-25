@@ -8,6 +8,9 @@ import pandas as pd
 import operator
 
 def ReadData(filename, tem):
+    # Read in the data. tem: True or False:
+    # True: Categorize tempo. False: Not Categorize tempo
+    # return: dataframe
     data2 = pd.read_csv(filename)
     attributes = list(data2.columns)  # the list of attribute
     listlabel = data2[data2.columns[0]]
@@ -40,6 +43,7 @@ def frequencyCount(arr):
     return dic
 
 def GetNewLabels(dic):
+    # Get 10 most frequent labels in the dataset, return these labels
     sort = sorted(dic.items(), key=operator.itemgetter(1), reverse=True)
     maintained = sort[:10]
     newlabels = []
@@ -65,6 +69,8 @@ def DropSomeData(data, newlabels):
     return data
 
 def ChangeDataValue(data):
+    # the function to categorize tempo in the data
+    # return data with categorized tempo
     for index, row in data.iterrows():
         tempo = row.tempo
         newtempo = CategorizeTempo(tempo)
@@ -93,25 +99,28 @@ def CategorizeTempo(tempo):
     elif tempo > 200:
         return 'Prestissimo'
 
+def DeleteAttributes(*args, data):
+    for attribute in args:
+        data = data.drop([attribute], axis=1)
+    return data
+
 def main():
     filename = sys.argv[1]
-    tem = False
+    tem = True
     data, attributes, labels = ReadData(filename, tem)
     print(data)
     dic = frequencyCount(labels)
     newlabels = GetNewLabels(dic)
-    # data = DropSomeData(data, newlabels)
+
     # print(newdata)
-    # newdata['tempo'] = newdata['tempo'].astype(str)
+    #listAttributes = ['loudness']
+    #data = DeleteAttributes(*listAttributes, data=data)
+    data = DropSomeData(data, newlabels)
+    # print(newdata)
+    #newdata['tempo'] = newdata['tempo'].astype(str)
     #newdata = ChangeDataValue(newdata)
-    # print(newdata)
 
     data.to_csv('small_data.csv', index=None)
-
-
-
-
-
 
 if __name__ == '__main__':
     main()
