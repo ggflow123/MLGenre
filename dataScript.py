@@ -82,6 +82,7 @@ def ChangeDataValue(data):
 
 
 def CategorizeTempo(tempo):
+    # Categorize the "Tempo" attribute: from numerical to categorical, based on a webpage
     if tempo <= 40:
         return 'Grave'
     elif tempo > 40 and tempo <= 60:
@@ -99,6 +100,7 @@ def CategorizeTempo(tempo):
     elif tempo > 200:
         return 'Prestissimo'
 
+# Delete desired attributes
 def DeleteAttributes(*args, data):
     for attribute in args:
         data = data.drop([attribute], axis=1)

@@ -12,6 +12,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.naive_bayes import GaussianNB, ComplementNB
 from sklearn.tree import DecisionTreeClassifier
 
+
+# Write Confusion Matrix
 def WriteConfusionMatrix(fname, result, labels, method):
     Fname = "result" + "_" + str(method) + "_" + str(fname[:-4]) + "CategorizedTempo" + ".csv"
     file = open(Fname, "w+")
@@ -21,23 +23,27 @@ def WriteConfusionMatrix(fname, result, labels, method):
         file.write((",".join(list(map(str, result[i])))).replace('"', '') + "\n")
     return
 
+# Implement Decision Tree Algorithm
 def DecisionTree(train, trainLabel, test):
     classifier = DecisionTreeClassifier(criterion='entropy')
     classifier.fit(train, trainLabel)
     prediction = classifier.predict(test)
     return prediction
 
+# Implement Support Vector Machine
 def SupportVectorClassification(train, trainLabel, test):
     classifierSVC = SVC(kernel='rbf', gamma='auto')
     classifierSVC.fit(train, trainLabel)
     prediction = classifierSVC.predict(test)
     return prediction
 
+# Implement Gaussian Naive Bayes
 def GaussianNaiveBayes(train, trainLabel, test):
     gnb = GaussianNB()
     prediction = gnb.fit(train, trainLabel).predict(test)
     return prediction
 
+# Implement Complement Naive Bayes
 def ComplementNaiveBayes(train, trainLabel, test):
     gnb = ComplementNB()
     prediction = gnb.fit(train, trainLabel).predict(test)
@@ -78,6 +84,7 @@ def ReadData(filename, seed, pt):
                     newlist.append(newvalue)
                 # newdata = pd.concat([newdata, data[a]], axis=1)
                 newdata[a] = newlist
+    
     # split the data into train, and test
     datalist = newdata.values.tolist()
     newattributes = list(newdata.columns)
